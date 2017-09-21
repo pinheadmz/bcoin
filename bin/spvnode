@@ -8,6 +8,7 @@ const assert = require('assert');
 const SPVNode = require('../lib/node/spvnode');
 const util = require('../lib/utils/util');
 const Outpoint = require('../lib/primitives/outpoint');
+const fs = require('fs');
 
 const node = SPVNode({
   config: true,
@@ -47,6 +48,23 @@ process.on('unhandledRejection', (err, promise) => {
         util.log(block.txs[1]);
     });
   }
+
+  // attempt to collect coinbase transactions by adding null outpoint to bloom filter
+  node.pool.watchOutpoint(new Outpoint());
+  node.on('block', (block) => {
+     console.log(" ---- new coinbase tx received ----");
+     var cbScriptSig = block.txs[0]['inputs'][0]['script'].toJSON();
+     // reverse byte order of little endian hash
+     var blockHash = block.hash('hex').match(/[a-fA-F0-9]{2}/g).reverse().join('');
+     console.log("Block hash: " + blockHash + "\n" + "Coinbase scriptSig: " + cbScriptSig);
+     fs.writeFile("/home/pi/.bcoin/spv_cb_" + blockHash, cbScriptSig, function(err){
+         if(err)
+             return console.log(err);
+        console.log("coinbase file saved\n--------");
+    });
+  });
+
+
 
   node.startSync();
 })().catch((err) => {
