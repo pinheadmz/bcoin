@@ -425,7 +425,7 @@ describe('Chain', function() {
     assert.strictEqual(state, 3);
   });
 
-  it('should test csv', async () => {
+  it('should test csv - blocks', async () => {
     const tx = (await chain.getBlock(chain.height - 100)).txs[0];
     const csvBlock = await mineCSV(tx);
 
@@ -456,7 +456,7 @@ describe('Chain', function() {
     assert(await chain.add(block));
   });
 
-  it('should fail csv with bad sequence', async () => {
+  it('should fail csv with bad sequence - blocks', async () => {
     const csv = (await chain.getBlock(chain.height - 100)).txs[0];
     const spend = new MTX();
 
@@ -485,7 +485,7 @@ describe('Chain', function() {
     assert(await chain.add(block));
   });
 
-  it('should fail csv lock checks', async () => {
+  it('should fail csv lock checks - blocks', async () => {
     const tx = (await chain.getBlock(chain.height - 100)).txs[0];
     const csvBlock = await mineCSV(tx);
 
@@ -515,6 +515,88 @@ describe('Chain', function() {
 
   it('should have correct wallet balance', async () => {
     assert.strictEqual(wallet.balance, 1412499980000);
+  });
+
+ it('should test csv - seconds', async () => {
+    const tx = (await chain.getBlock(chain.height - 100)).txs[0];
+    const csvBlock = await mineCSV(tx);
+
+    assert(await chain.add(csvBlock));
+
+    const csv = csvBlock.txs[1];
+
+    const spend = new MTX();
+
+    spend.addOutput({
+      script: [
+        Opcode.fromInt(2),
+        Opcode.fromSymbol('checksequenceverify')
+      ],
+      value: 10000
+    });
+
+    spend.addTX(csv, 0);
+    spend.setSequence(0, 60 * 60 * 24, true);
+
+    const job = await cpu.createJob();
+
+    job.addTX(spend.toTX(), spend.view);
+    job.refresh();
+
+    const block = await job.mineAsync();
+
+    assert(await chain.add(block));
+  });
+
+  it('should fail csv with bad sequence - seconds', async () => {
+    const csv = (await chain.getBlock(chain.height - 100)).txs[0];
+    const spend = new MTX();
+
+    spend.addOutput({
+      script: [
+        Opcode.fromInt(1),
+        Opcode.fromSymbol('checksequenceverify')
+      ],
+      value: 1 * 1e8
+    });
+
+    spend.addTX(csv, 0);
+    spend.setSequence(0, 60 * 60 * 24, true);
+
+    const job = await cpu.createJob();
+    job.addTX(spend.toTX(), spend.view);
+    job.refresh();
+
+    assert.strictEqual(await mineBlock(job),
+      'mandatory-script-verify-flag-failed');
+  });
+
+  it('should fail csv lock checks - seconds', async () => {
+    const tx = (await chain.getBlock(chain.height - 100)).txs[0];
+    const csvBlock = await mineCSV(tx);
+
+    assert(await chain.add(csvBlock));
+
+    const csv = csvBlock.txs[1];
+
+    const spend = new MTX();
+
+    spend.addOutput({
+      script: [
+        Opcode.fromInt(2),
+        Opcode.fromSymbol('checksequenceverify')
+      ],
+      value: 1 * 1e8
+    });
+
+    spend.addTX(csv, 0);
+    spend.setSequence(0, 60 * 60 * 24, true);
+
+    const job = await cpu.createJob();
+    job.addTX(spend.toTX(), spend.view);
+    job.refresh();
+
+    assert.strictEqual(await mineBlock(job), 'bad-txns-nonfinal');
   });
 
   it('should fail to connect bad bits', async () => {
@@ -627,7 +709,7 @@ describe('Chain', function() {
       assert(await chain.add(block));
     }
 
-    assert.strictEqual(chain.height, 2636);
+    assert.strictEqual(chain.height, 2638);
   });
 
   it('should mine a witness tx', async () => {
@@ -836,7 +918,7 @@ describe('Chain', function() {
       assert(await chain.add(block, flags));
     }
 
-    assert.strictEqual(chain.height, 2749);
+    assert.strictEqual(chain.height, 2751);
   });
 
   it('should fail to connect too many sigops', async () => {
