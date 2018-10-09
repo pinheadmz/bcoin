@@ -196,7 +196,7 @@ describe('HTTP', function() {
   });
 
   // requires deriveReceive() from https://github.com/bcoin-org/bclient/pull/13
-  xit('should derive P2PKH recieve address at index', async () => {
+  it('should derive P2PKH recieve address at index', async () => {
     await wallet.createAddress('foo1'); // index 2
     const recaddr3 = await wallet.createAddress('foo1'); // index 3
     await wallet.createAddress('foo1'); // index 4
@@ -256,7 +256,7 @@ describe('HTTP', function() {
   });
 
   // requires deriveReceive() from https://github.com/bcoin-org/bclient/pull/13
-  xit('should derive legacy multisig recieve address at index', async () => {
+  it('should derive legacy multisig recieve address at index', async () => {
     await wallet.createAddress('foo2'); // index 2
     const recaddr3 = await wallet.createAddress('foo2'); // index 3
     await wallet.createAddress('foo2'); // index 4
