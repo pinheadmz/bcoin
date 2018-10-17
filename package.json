@@ -26,7 +26,7 @@
     "bcfg": "~0.1.4",
     "bclient": "~0.1.5",
     "bcrypto": "~3.0.1",
-    "bdb": "~1.1.3",
+    "bdb": "braydonf/bdb#reverse",
     "bdns": "~0.1.3",
     "bevent": "~0.1.3",
     "bfile": "~0.1.3",
