@@ -1,110 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>bcoin</title>
-    <meta charset="utf-8">
-    <style>
-      html {
-        height: 100%;
-      }
-      body {
-        height: 90%;
-        padding: 20px;
-      }
-      h1 {
-        font: 3em monospace;
-        margin: 10px;
-        padding: 0;
-      }
-      small {
-        margin: 10px;
-        width: 50%;
-        display: block;
-      }
-      .log {
-        padding: 5px;
-        margin-left: 10px;
-        overflow-y: scroll;
-        border: 1px solid black;
-        white-space: pre-wrap;
-        height: 40%;
-        width: 40%;
-        font: 1em monospace;
-        margin-top: 10px;
-      }
-      .wallet {
-        padding: 5px;
-        margin-left: 5px;
-        margin-top: 10px;
-        font: 1em monospace;
-      }
-      .rpc, .send {
-        padding: 5px;
-        margin-left: 5px;
-        margin-top: 10px;
-        font: 1em monospace;
-      }
-      #newaddr{
-        display: block;
-        margin-left: 10px;
-      }
-      .tx {
-        float: right;
-        font: 1em monospace;
-        padding: 5px;
-        border: 1px solid black;
-        margin-top: 10px;
-      }
-      a {
-        text-decoration: none;
-      }
-      .floating {
-        font: 1em monospace;
-        white-space: pre-wrap;
-        position: absolute;
-        display: none;
-        padding: 5px;
-        background: white;
-        border: 1px solid black;
-        width: 40%;
-        height: 30%;
-        top: 50%;
-        left: 50%;
-        margin-left: -20%;
-        margin-top: -15%;
-        overflow-y: scroll;
-      }
-    </style>
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <h1>Bcoin, the browser full node</h1>
-    <small>
-      Welcome. Your machine is currently validating the blockchain. The blocks
-      and wallet are stored on your local disk with indexed DB. You are
-      connecting to the actual bitcoin P2P network via a websocket-&gt;tcp
-      proxy. Enjoy. (See the
-      <a href="https://github.com/bcoin-org/bcoin"
-        target="_blank">bcoin repo</a>
-      for more bitcoin magic).
-    </small>
-    <div class="tx">
-      <div>Chain State: <span id="state"></span></div>
-      <div>Last 20 Blocks/TXs:</div>
-      <div id="tx"></div>
-    </div>
-    <div id="log" class="log"></div>
-    <form id="rpc" class="rpc" action="#">
-      <input type="text" name="cmd" id="cmd"
-        placeholder="RPC command (e.g. getblockchaininfo)">
-    </form>
-    <div id="wallet" class="wallet"></div>
-    <form id="send" class="send" action="#">
-      <input type="text" name="address" id="address" placeholder="Address">
-      <input type="text" name="amount" id="amount" placeholder="Amount (BTC)">
-      <input type="submit" value="Send">
-    </form>
-    <input type="button" id="newaddr" value="New Address">
-    <div id="floating" class="floating"></div>
-  </body>
-</html>
+<!doctype html>
+<title>Bcoin - A javascript bitcoin library</title>
+<style>
+html, body, p, div { padding: 0; margin: 0; }
+p { margin: 15px; }
+body > div > small {
+  display: block;
+  margin: 15px;
+  font-family: monospace;
+  font-size: 12px;
+}
+body > div > h1 {
+  font-family: monospace;
+  font-size: 25px;
+  margin: 15px;
+  padding: 0;
+}
+body > div {
+  height: 490px;
+  width: 466px;
+  font-family: monospace;
+  font-size: 18px;
+  border: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -233px;
+  margin-top: -320px;
+}
+table, th, td {
+  border: 1px solid black;
+  padding: 5px;
+}
+</style>
+<div>
+  <h1>A bitcoin node in the browser</h1>
+  <p>Welcome. This is the entry page for starting a bitcoin node in your
+  browser (using <a href="https://github.com/bcoin-org/bcoin">bcoin</a>).  This
+  will create a real node in your browser: your <em>browser</em> will
+  connect to the p2p network and do all of the block verification/serving. It
+  will maintain a mempool (in pruned mode) and wallet database.</p>
+  <p><b>Warning</b>: this will use a lot of your bandwidth, cpu, and
+  potentially disk space.</p>
+  <small><em>Note:</em> Please do not abuse the ws-&gt;tcp proxy. It already
+  blocks all ports except bitcoin ports. If it is abused, I will be forced to
+  require a proof of work for socket creation, making it slower for
+  everyone.</small>
+  <p>For more information on bcoin's browser mode,
+  <a href="https://bcoin.io/guides/browser">see our guide on bcoin.io</a></p> 
+
+  <table>
+    <tr>
+      <th></th>
+      <th>Main</th>
+      <th>Testnet</th> 
+    </tr>
+    <tr>
+      <td style='font-weight:bold'>Pruned Node</td>
+      <td><a href='/main-prune/index.html'>Main-Prune</a></td>
+      <td><a href='/testnet-prune/index.html'>Testnet-Prune</a></td>
+    </tr>
+    <tr>
+      <td style='font-weight:bold'>SPV Node</td>
+      <td><a href='/main-spv/index.html'>Main-SPV</a></td>
+      <td><a href='/testnet-prune/index.html'>Testnet-SPV</a></td>
+    </tr>
+  </table>
