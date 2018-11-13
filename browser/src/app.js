@@ -59,7 +59,7 @@ const node = new FullNode({
   hash: true,
   query: true,
   prune: true,
-  network: 'main',
+  network: 'testnet',
   memory: false,
   coinCache: 30,
   logConsole: true,

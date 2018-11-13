@@ -5,8 +5,8 @@ const fs = require('bfile');
 const WSProxy = require('./wsproxy');
 const Validator = require('bval');
 
-
 const index = fs.readFileSync(`${__dirname}/index.html`);
+const browsernode = fs.readFileSync(`${__dirname}/browsernode.html`);
 
 const proxy = new WSProxy({
   ports: [8333, 18333, 18444, 28333, 28901]
@@ -33,9 +33,7 @@ server.get('/', (req, res) => {
 });
 
 server.get('/:dir/index.html', (req, res) => {
-  const valid = Validator.fromRequest(req);
-  const dir = valid.str('dir');
-  res.send(200, getFile(dir, 'index.html'), 'html');
+  res.send(200, browsernode, 'html');
 });
 
 server.get('/:dir/app.js', (req, res) => {
