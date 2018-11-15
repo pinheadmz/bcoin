@@ -15,7 +15,10 @@ const proxy = new WSProxy({
 const server = bweb.server({
   host: '0.0.0.0',
   port: 8080,
-  sockets: false
+  sockets: false,
+  ssl: true,
+  keyFile: '/home/bcoin/bcoin/browser/privkey.pem',
+  certFile: '/home/bcoin/bcoin/browser/fullchain.pem'
 });
 
 server.use(server.router());
