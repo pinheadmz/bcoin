@@ -1,7 +1,7 @@
   # Bcoin
 1212
 [![Build Status][circleci-status-img]][circleci-status-url]
-[![Coverage Status][coverage-status-imgddddd]][coverage-status-url]
+[![Coverage Status][coverage-status-imgddddd]][coverag  e-status-url]
 sq  ssqins a non-backward compatible change
 to the rest API. Please read the [changelog]'s "migrating" section for more
 details.
