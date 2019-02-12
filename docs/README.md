@@ -1,55 +1,29 @@
 Welcome to the bcoin docs!
 
 ## Getting Started
-- [Getting Started][getting-started]
-- [Configuration][configuration]
-- [Wallet System][wallet-system]
-- [Design][design]
-- [Guides][guides]
+- [Getting Started](Beginner's-Guide.md)
+- [Configuration](Configuration.md)
+- [Wallet System](Wallet-System.md)
+- [Design](Design.md)
+- [Guides](https://bcoin.io/guides.html)
 
 ## Running
-- [Bcoin CLI][cli]
-- [Running in the Browser][browser]
-- [REST and RPC API][rest-rpc]
+- [Bcoin CLI](CLI.md)
+- [Running in the Browser](Running-in-the-browser.md)
+- [REST and RPC API](https://bcoin.io/api-docs/index.html#introduction)
 
 ## Code Examples
-- [Simple Fullnode][example-simple-fullnode]
-- [Connect to Peer][example-connect-peer]
-- [Connecting to the P2P Network][example-p2p]
-- [Creating a Blockchain and Mempool][example-blockchain]
-- [Wallet with Dummy TX][example-wallet-dummy]
-- [Fullnode Object][example-fullnode-wallet]
-- [SPV Sync][example-spv]
-- [Plugin Example][example-peers-plugin]
-- [Client API Usage][example-client-api]
-- [Miner with WorkerPool][example-miner-configs]
-- [Create and Sign TX][example-tx-create-sign]
-- [Get Transaction from Chain][example-tx-from-chain]
-- [Create Watch Only Wallet][example-watch-only-wallet]
-- [Generate random txs and blocks][generate-blocks-and-txs]
-
-
-[getting-started]: Beginner's-Guide.md
-[configuration]: Configuration.md
-[design]: Design.md
-[wallet-system]: Wallet-System.md
-[guides]: http://bcoin.io/guides.html
-
-[cli]: CLI.md
-[browser]: Running-in-the-browser.md
-[rest-rpc]: http://bcoin.io/api-docs/index.html#introduction
-
-[example-p2p]: Examples/connect-to-the-p2p-network.js
-[example-blockchain]: Examples/create-a-blockchain-and-mempool.js
-[example-fullnode-wallet]: Examples/fullnode-and-wallet.js
-[example-spv]: Examples/spv-sync-wallet.js
-[example-wallet-dummy]: Examples/wallet.js
-[example-peers-plugin]: Examples/peers-plugin.js
-[example-client-api]: Examples/client-api.js
-[example-miner-configs]: Examples/miner-configs.js
-[example-connect-peer]: Examples/connect-to-peer.js
-[example-simple-fullnode]: Examples/fullnode.js
-[example-tx-create-sign]: Examples/create-sign-tx.js
-[example-tx-from-chain]: Examples/get-tx-from-chain.js
-[example-watch-only-wallet]: Examples/watch-only-wallet.js
-[generate-blocks-and-txs]: Examples/generate-blocks-and-txs.js
+- [Simple Fullnode](Examples/fullnode.js)
+- [Connect to Peer](Examples/connect-to-peer.js)
+- [Connecting to the P2P Network](Examples/connect-to-the-p2p-network.js)
+- [Creating a Blockchain and Mempool](Examples/create-a-blockchain-and-mempool.js)
+- [Wallet with Dummy TX](Examples/wallet.js)
+- [Fullnode Object](Examples/fullnode-and-wallet.js)
+- [SPV Sync](Examples/spv-sync-wallet.js)
+- [Plugin Example](Examples/peers-plugin.js)
+- [Client API Usage](Examples/client-api.js)
+- [Miner with WorkerPool](Examples/miner-configs.js)
+- [Create and Sign TX](Examples/create-sign-tx.js)
+- [Get Transaction from Chain](Examples/get-tx-from-chain.js)
+- [Create Watch Only Wallet](Examples/watch-only-wallet.js)
+- [Generate random txs and blocks](Examples/generate-blocks-and-txs.js)
