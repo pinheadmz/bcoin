@@ -9,7 +9,7 @@ Welcome to the bcoin docs!
 
 ## Running
 - [Bcoin CLI](CLI.md)
-- [Running in the Browser](Running-in-the-browser.md)
+- [Running in the Browser](https://bcoin.io/guides/browser.html)
 - [REST and RPC API](https://bcoin.io/api-docs/index.html#introduction)
 
 ## Code Examples
