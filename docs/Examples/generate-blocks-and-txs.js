@@ -1,8 +1,20 @@
 'use strict';
 
-const bcoin = require('bcoin');
+const bcoin = require('../..');
 const client = require('bclient');
+const plugin = bcoin.wallet.plugin;
 const network = bcoin.Network.get('regtest');
+
+bcoin.consensus.COINBASE_MATURITY = 0;
+
+const node = new bcoin.FullNode({
+  network: 'regtest',
+  db: 'memory'
+});
+
+node.use(plugin);
+
+const miner = node.miner;
 
 const walletClient = new client.WalletClient({
   port: network.walletPort
@@ -13,12 +25,14 @@ const nodeClient = new client.NodeClient({
 });
 
 (async () => {
+  await node.open();
+
   const feeRate = network.minRelay * 10;
 
   // Initial blocks mined to
   // wallet/account primary/default then evenly disperses
   // all funds to other wallet accounts
-  const numInitBlocks = 300; 
+  const numInitBlocks = 100;
 
   const numTxBlocks = 10; // How many blocks to randomly fill with txs
   const numTxPerBlock = 10; // How many txs to try to put in each block
@@ -26,6 +40,10 @@ const nodeClient = new client.NodeClient({
   const maxOutputsPerTx = 4; // Each tx will have a random # of outputs
   const minSend = 50000; // Each tx output will have a random value
   const maxSend = 100000;
+
+  // We are going to bend time, and start our blockchain in the past!
+  let virtualNow = network.now() - 60 * 10 * (numInitBlocks + numTxBlocks + 1);
+  const blockInterval = 60 * 10; // ten minutes
 
   const walletNames = [
     'Powell',
@@ -43,6 +61,16 @@ const nodeClient = new client.NodeClient({
   const accountNames = ['hot', 'cold'];
 
   const wallets = [];
+
+  const mineRegtestBlockToPast = async function(coinbaseAddr) {
+    const entry = await node.chain.getEntry(node.chain.tip.hash);
+    const job = await node.miner.createJob(entry, coinbaseAddr);
+    job.attempt.time = virtualNow;
+    virtualNow += blockInterval;
+    job.refresh();
+    const block = await job.mineAsync();
+    await node.chain.add(block);
+  };
 
   console.log('Creating wallets and accounts...');
   for (const wName of walletNames) {
@@ -80,15 +108,16 @@ const nodeClient = new client.NodeClient({
 
   console.log('Mining initial blocks...');
   const primary = walletClient.wallet('primary');
-  const minerReceive = await primary.createAddress('default');
-
-  await nodeClient.execute('generatetoaddress', [numInitBlocks, minerReceive.address]);  
+  const addrObject = await primary.createAddress('default');
+  const minerReceive = addrObject.address;
+  for (let i = 0; i < numInitBlocks; i++) {
+    await mineRegtestBlockToPast(minerReceive);
+  }
 
   console.log('Air-dropping funds to the people...');
   const balance = await primary.getBalance('default');
 
-  // hack the available balance bc of coinbase maturity
-  const totalAmt = balance.confirmed * 0.25;
+  const totalAmt = balance.confirmed;
   const amtPerAcct = Math.floor(
     totalAmt / (walletNames.length * accountNames.length)
   );
@@ -110,7 +139,7 @@ const nodeClient = new client.NodeClient({
   });
 
   console.log('Confirming airdrop...');
-  await nodeClient.execute('generatetoaddress', [1, minerReceive.address]);  
+  await mineRegtestBlockToPast(minerReceive);
 
   console.log('Creating a big mess!...');
   for (let b = 0; b < numTxBlocks; b++) {
@@ -148,7 +177,7 @@ const nodeClient = new client.NodeClient({
     }
 
     // CONFIRM
-  await nodeClient.execute('generatetoaddress', [1, minerReceive.address]);  
+    await mineRegtestBlockToPast(minerReceive);
   }
 
   console.log('All done! Go play.');
