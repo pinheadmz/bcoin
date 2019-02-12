@@ -32,7 +32,7 @@ const miner = new bcoin.Miner({
   const block = await job.mineAsync();
 
   // Add the block to the chain
-  console.log('Adding %s to the blockchain.', block.rhash);
+  console.log('Adding %s to the blockchain.', block.rhash());
   console.log(block);
   await chain.add(block);
   console.log('Added block!');
