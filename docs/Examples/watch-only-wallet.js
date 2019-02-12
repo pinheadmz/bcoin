@@ -1,10 +1,11 @@
-const {HDPrivateKey,Network} = require('bcoin');
-const {Mnemonic} = require('bcoin/lib/hd');
+'use strict';
+
+const {HDPrivateKey, Network, Mnemonic} = require('bcoin');
 const {WalletClient} = require('bclient');
 
 (async () => {
 
-  // use well know test passphrase
+  // use well known test mnemonic
   const phrase = [
     'abandon',
     'abandon',
@@ -20,7 +21,7 @@ const {WalletClient} = require('bclient');
     'about',
   ].join(' ');
 
-  const network = Network.get('main');
+  const network = Network.get('regtest');
 
   const mnemonic = Mnemonic.fromPhrase(phrase);
 
@@ -52,11 +53,15 @@ const {WalletClient} = require('bclient');
   // the wallet will generate lookahead
   // addresses from the account extended public key
   // and can find spendable coins in the blockchain state
-  const response = await client.createWallet('mywallet', {
+  const wallet = await client.createWallet('mywallet', {
     accountKey: xpub,
     watchOnly: true,
   });
 
+  const addr0 = await client.wallet('mywallet').createAddress('default');
+
+  console.log('Wallet:\n', wallet);
+
+  console.log('Address 0\n: ', addr0);
+
 })();
-
-
