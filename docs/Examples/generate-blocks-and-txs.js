@@ -13,16 +13,7 @@ const node = new bcoin.FullNode({
 });
 
 node.use(plugin);
-
-const miner = node.miner;
-
-const walletClient = new client.WalletClient({
-  port: network.walletPort
-});
-
-const nodeClient = new client.NodeClient({
-  port: network.rpcPort
-});
+const wdb = node.plugins.walletdb.wdb;
 
 (async () => {
   await node.open();
@@ -74,26 +65,22 @@ const nodeClient = new client.NodeClient({
 
   console.log('Creating wallets and accounts...');
   for (const wName of walletNames) {
+
     try {
       const wwit = Boolean(Math.random() < 0.5);
-      await walletClient.createWallet(
-        wName,
-        {
-          witness: wwit
-        }
-      );
+      const newWallet = await wdb.create({
+        id: wName,
+        witness: wwit
+      });
 
-      const newWallet = await walletClient.wallet(wName);
       wallets.push(newWallet);
 
       for (const aName of accountNames) {
         const awit = Boolean(Math.random() < 0.5);
-        await newWallet.createAccount(
-          aName,
-          {
-            witness: awit
-          }
-        );
+        await newWallet.createAccount({
+          name: aName,
+          witness: awit
+        });
       }
     } catch (e) {
       console.log(`Error creating wallet ${wName}:`, e.message);
@@ -107,32 +94,32 @@ const nodeClient = new client.NodeClient({
   accountNames.push('default');
 
   console.log('Mining initial blocks...');
-  const primary = walletClient.wallet('primary');
-  const addrObject = await primary.createAddress('default');
-  const minerReceive = addrObject.address;
+  const primary = await wdb.get('primary');
+  const minerReceive = await primary.receiveAddress(0);
   for (let i = 0; i < numInitBlocks; i++) {
     await mineRegtestBlockToPast(minerReceive);
   }
 
   console.log('Air-dropping funds to the people...');
-  const balance = await primary.getBalance('default');
+  const balance = await primary.getBalance(0);
 
   const totalAmt = balance.confirmed;
   const amtPerAcct = Math.floor(
     totalAmt / (walletNames.length * accountNames.length)
   );
+
   const outputs = [];
   for (const wallet of wallets) {
     for (const aName of accountNames) {
-      const recAddr = await wallet.createAddress(aName);
+      const recAddr = await wallet.receiveAddress(aName);
       outputs.push({
         value: amtPerAcct,
-        address: recAddr.address
+        address: recAddr
       });
     }
   }
 
-  await primary.send({
+  const t = await primary.send({
     outputs: outputs,
     rate: feeRate,
     subtractFee: true
@@ -151,13 +138,14 @@ const nodeClient = new client.NodeClient({
         const recWallet = wallets[Math.floor(Math.random() * wallets.length)];
         const recAcct =
           accountNames[Math.floor(Math.random() * accountNames.length)];
-        const recAddr = await recWallet.createAddress(recAcct);
+        const recAddr = await recWallet.receiveAddress(recAcct);
         const value = Math.floor(
           Math.random() * (maxSend - minSend) + minSend / numOutputs
         );
+
         outputs.push({
           value: value,
-          address: recAddr.address
+          address: recAddr
         });
       }
 
@@ -165,7 +153,7 @@ const nodeClient = new client.NodeClient({
       const sendWallet = wallets[Math.floor(Math.random() * wallets.length)];
       const sendAcct = accountNames[Math.floor(Math.random() * wallets.length)];
       try {
-        const tx = await sendWallet.send({
+        await sendWallet.send({
           account: sendAcct,
           outputs: outputs,
           rate: feeRate,
