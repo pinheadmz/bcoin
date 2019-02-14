@@ -4,24 +4,19 @@ const bcoin = require('../..');
 
 const key = bcoin.wallet.WalletKey.generate('regtest');
 
-const workers = new bcoin.WorkerPool({
-  enabled: true
-});
-
 const chain = new bcoin.Chain({
-  network: 'regtest',
-  workers: workers
+  network: 'regtest'
 });
 
 const miner = new bcoin.Miner({
   chain: chain,
   addresses: [key.getAddress()],
-  coinbaseFlags: 'my-miner',
-  workers: workers
+  coinbaseFlags: 'my-miner'
 });
 
 (async () => {
   await miner.open();
+  await chain.open();
 
   const tmpl = await miner.createBlock();
 
@@ -33,6 +28,7 @@ const miner = new bcoin.Miner({
 
   console.log('Mined block:');
   console.log(block);
+  console.log('Coinbase transaction:');
   console.log(block.txs[0]);
 
   await chain.add(block);
