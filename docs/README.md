@@ -18,7 +18,6 @@ Welcome to the bcoin docs!
 - [Connecting to the P2P Network](Examples/connect-to-the-p2p-network.js)
 - [Creating a Blockchain and Mempool](Examples/create-a-blockchain-and-mempool.js)
 - [Wallet with Dummy TX](Examples/wallet.js)
-- [Fullnode Object](Examples/fullnode-and-wallet.js)
 - [SPV Sync](Examples/spv-sync-wallet.js)
 - [Plugin Example](Examples/peers-plugin.js)
 - [Client API Usage](Examples/client-api.js)
