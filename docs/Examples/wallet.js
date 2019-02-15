@@ -1,7 +1,7 @@
 'use strict';
 
 const bcoin = require('../..');
-const random = require('bcrypto/lib/random');
+const {random} = require('bcrypto');
 
 function dummy() {
   const hash = random.randomBytes(32);
@@ -34,12 +34,11 @@ const walletdb = new bcoin.wallet.WalletDB({
 
   const tx = mtx.toTX();
 
+  wallet.on('tx', (tx) => {
+    console.log('Received transaciton:\n', tx);
+  })
+
   await walletdb.addTX(tx);
-
-  const wtx = await wallet.getTX(tx.hash());
-
-  console.log('Added transaction');
-  console.log(wtx);
 })().catch((err) => {
   console.error(err.stack);
   process.exit(1);
