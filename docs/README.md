@@ -79,7 +79,32 @@ The script returns wallet and node server information, sends a transaction, and
 reports the wallet balance.
 
 - [Miner with WorkerPool](Examples/miner-configs.js)
+
+Creates a regtest `chain` and `miner`, which mines a block using workers
+(a `child_process` that searches the nonce space in a parallel thread).
+
 - [Create and Sign TX](Examples/create-sign-tx.js)
+
+Demonstrates how to use `mtx` and `keyring` modules to sign a transaction.
+
 - [Get Transaction from Chain](Examples/get-tx-from-chain.js)
+
+Connects to live testnet network and syncs the first 1000 blocks with indexing
+active. Demonstrates how to request tx by hash from the chain database, and retrieve
+blocks.
+
 - [Create Watch Only Wallet](Examples/watch-only-wallet.js)
+
+Derives a BIP32 Extended Public Key from a mnemonic phrase, and imports that `xpub`
+into a new watch-only wallet that can derive addresses.
+
 - [Generate random txs and blocks](Examples/generate-blocks-and-txs.js)
+
+Intended as a base upon which to test other bcoin functions, this script creates
+ten wallets with several accounts each, generates 100 blocks, then fills 10 blocks
+with 10 randomly generated transactions each. The regtest node remains open so the
+user can query the API from another command line:
+
+```
+$ bcoin-cli block 120
+```
