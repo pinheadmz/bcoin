@@ -1,40 +1,27 @@
-Bcoin ships with [bclient](https://github.com/bcoin-org/bclient)
-as its default HTTP client for command line access.
+Bcoin ships with [bclient](https://github.com/bcoin-org/bclient) as its default client 
+to the [API](https://bcoin.io/api-docs) for command line access.
 
-See the full API docs at https://bcoin.io/api-docs
+## Configuration
 
-The most important thing to remember about the bcoin API is that there are
-effectively four total domains: There are separate servers for both node and wallet,
-and each of those has both REST HTTP API endpoints and JSON-RPC API endpoints.
-
-### Examples: passing arguments
-
-Store network name and API key in environment variables:
-
+Using environment variables:
 ```bash
 $ export BCOIN_API_KEY=hunter2
 $ export BCOIN_NETWORK=testnet
-```
-
-bcoin will read the environment variables on launch...
-
-```bash
 $ bcoin --daemon
-```
-
-...and so will the CLI:
-
-```bash
 $ bcoin-cli info
 ```
 
-Or they can be passed as command-line arguments:
+With command-line arguments:
 
 ```bash
 $ bcoin-cli --network=testnet --api-key=hunter2 info
 ```
 
-### Examples: Common node commands
+You can also use `~/.bcoin/bcoin.conf` for configuration options, see [Configuration](Configuration.md) for the full details.
+
+## Examples
+
+Common node commands:
 
 ```bash
 # View the genesis block
@@ -47,7 +34,7 @@ $ bcoin-cli mempool
 $ bcoin-cli rpc getpeerinfo
 ```
 
-### Examples: Common wallet commands
+Common wallet commands:
 
 ```bash
 # View primary wallet
@@ -72,7 +59,7 @@ $ bwallet-cli account create foo
 $ bwallet-cli send <address> 0.01 --account=foo
 ```
 
-### Get more help
+Get more help:
 
 ```bash
 $ bcoin-cli help
