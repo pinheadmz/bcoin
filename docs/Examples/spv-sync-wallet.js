@@ -1,78 +1,82 @@
 'use strict';
 
 const bcoin = require('../..');
+
 bcoin.set('regtest');
 
 // SPV chains only store the chain headers.
-const SPVchain = new bcoin.Chain({
+const chain = new bcoin.Chain({
   spv: true
 });
-const SPVpool = new bcoin.Pool({
-  chain: SPVchain,
+
+const pool = new bcoin.Pool({
+  chain: chain,
   maxOutbound: 1
 });
-const SPVwalletdb = new bcoin.wallet.WalletDB({ memory: true });
 
-// FULL node will provide tx data to SPV node
-const FULLchain = new bcoin.Chain();
-const FULLpool = new bcoin.Pool({
-  chain: FULLchain,
+const walletdb = new bcoin.wallet.WalletDB({ memory: true });
+
+// Full node will provide tx data to SPV node
+const full = {};
+full.chain = new bcoin.Chain();
+full.pool = new bcoin.Pool({
+  chain: full.chain,
   port: 44444,
   bip37: true,
   listen: true
 });
 
 (async () => {
-  await SPVpool.open();
-  await SPVwalletdb.open();
-  await SPVchain.open();
-  await SPVpool.connect();
+  await pool.open();
+  await walletdb.open();
+  await chain.open();
+  await pool.connect();
 
-  await FULLpool.open();
-  await FULLchain.open();
-  await FULLpool.connect();
+  await full.pool.open();
+  await full.chain.open();
+  await full.pool.connect();
 
-  const SPVwallet = await SPVwalletdb.create();
-  const SPVWalletAddress = await SPVwallet.receiveAddress();
-  console.log('Created wallet with address %s', SPVWalletAddress);
+  const wallet = await walletdb.create();
+  const walletAddress = await wallet.receiveAddress();
+  console.log('Created wallet with address %s', walletAddress);
 
-  // Add our address to the spv filter.
-  SPVpool.watchAddress(SPVWalletAddress);
+  // Add our address to the SPV filter.
+  pool.watchAddress(walletAddress);
 
   // Start the blockchain sync.
-  SPVpool.startSync();
+  pool.startSync();
 
-  // get ready to receive transactions!
-  SPVpool.on('tx', (tx) => {
+  // Get ready to receive transactions!
+  pool.on('tx', (tx) => {
     console.log('Received TX:\n', tx);
 
-    SPVwalletdb.addTX(tx);
+    walletdb.addTX(tx);
     console.log('TX added to wallet DB!');
   });
 
-  SPVwallet.on('balance', (balance) => {
+  wallet.on('balance', (balance) => {
     console.log('Balance updated:\n', balance.toJSON());
   });
 
-  // connect the SPV node to the Full Node server
-  const netAddr = await SPVpool.hosts.addNode('127.0.0.1:44444');
-  const peer = SPVpool.createOutbound(netAddr);
-  SPVpool.peers.add(peer);
+  // Connect the SPV node to the full node server
+  const netAddr = await pool.hosts.addNode('127.0.0.1:44444');
+  const peer = pool.createOutbound(netAddr);
+  pool.peers.add(peer);
 
-  FULLpool.on('peer open', async () => {
-    console.log('SPV node peers:\n', SPVpool.peers);
-    console.log('FULL node peers:\n', FULLpool.peers);
+  full.pool.on('peer open', async () => {
+    console.log('SPV node peers:\n', pool.peers);
+    console.log('Full node peers:\n', full.pool.peers);
 
-    // Create a dummy transaction and send it from FULL to SPV node
+    // Create a dummy transaction and send it from full to SPV node
     const mtx = new bcoin.MTX();
     mtx.addOutpoint(new bcoin.Outpoint(bcoin.consensus.ZERO_HASH, 0));
-    mtx.addOutput(SPVWalletAddress, 12000);
+    mtx.addOutput(walletAddress, 12000);
     const tx = mtx.toTX();
 
     // Give the node a few seconds to process connection before sending
     console.log('Waiting for transaction...');
     await new Promise(r => setTimeout(r, 3000));
-    await FULLpool.broadcast(tx);
+    await full.pool.broadcast(tx);
   });
 })().catch((err) => {
   console.error(err.stack);
