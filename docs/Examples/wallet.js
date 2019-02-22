@@ -1,7 +1,7 @@
 'use strict';
 
 const bcoin = require('../..');
-const {random} = require('bcrypto');
+const random = require('bcrypto/lib/random');
 
 function dummy() {
   const hash = random.randomBytes(32);
