@@ -1,7 +1,6 @@
 'use strict';
 
 const bcoin = require('../..');
-bcoin.set('regtest');
 
 const key = bcoin.wallet.WalletKey.generate('regtest');
 
@@ -10,6 +9,7 @@ const workers = new bcoin.WorkerPool({
 });
 
 const chain = new bcoin.Chain({
+  network: 'regtest',
   workers: workers
 });
 
