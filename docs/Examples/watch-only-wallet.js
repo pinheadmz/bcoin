@@ -3,21 +3,11 @@
 const bcoin = require('../..');
 
 (async () => {
-
   // use well known test mnemonic
   const phrase = [
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'abandon',
-    'about',
+    'abandon', 'abandon', 'abandon', 'abandon',
+    'abandon', 'abandon', 'abandon', 'abandon',
+    'abandon', 'abandon', 'abandon', 'about'
   ].join(' ');
 
   const network = bcoin.Network.get('regtest');
@@ -50,7 +40,7 @@ const bcoin = require('../..');
   // addresses from the account extended public key
   // and can find spendable coins in the blockchain state
   const wdb = new bcoin.wallet.WalletDB({
-    network: 'testnet',
+    network: 'regtest',
     memory: true
   });
 
@@ -60,7 +50,7 @@ const bcoin = require('../..');
   const wallet = await wdb.create({
     name: 'my-watch-only-wallet',
     accountKey: xpub,
-    watchOnly: true,
+    watchOnly: true
   });
 
   // xpub account key placed at Account 0. Address 0 is already derived.
@@ -68,14 +58,13 @@ const bcoin = require('../..');
 
   // create new receive addresses through the deterministic chain
   const key1 = await wallet.createReceive(0);
-  const addr1 = key1.getAddress('string', 'testnet');
+  const addr1 = key1.getAddress('string', 'regtest');
 
   const key2 = await wallet.createReceive(0);
-  const addr2 = key2.getAddress('string', 'testnet');
+  const addr2 = key2.getAddress('string', 'regtest');
 
   console.log('Wallet:\n', wallet);
   console.log('Account:\n', acct0);
   console.log('Address 1:\n', addr1);
   console.log('Address 2:\n', addr2);
-
 })();
