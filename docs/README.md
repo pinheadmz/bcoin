@@ -98,13 +98,3 @@ blocks.
 Derives a BIP32 Extended Public Key from a mnemonic phrase, and imports that `xpub`
 into a new watch-only wallet that can derive addresses.
 
-- [Generate random txs and blocks](Examples/generate-blocks-and-txs.js)
-
-Intended as a base upon which to test other bcoin functions, this script creates
-ten wallets with several accounts each, generates 100 blocks, then fills 10 blocks
-with 10 randomly generated transactions each. The regtest node remains open so the
-user can query the API from another command line:
-
-```
-$ bcoin-cli block 120
-```
