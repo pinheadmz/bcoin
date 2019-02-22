@@ -136,7 +136,8 @@ async function callNodeApi() {
   console.log(tx);
 
   await callNodeApi();
-  process.exit(0);
+  await walletClient.close();
+  await node.close();
 })().catch((err) => {
   console.error(err.stack);
   process.exit(1);
