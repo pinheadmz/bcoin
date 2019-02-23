@@ -12,7 +12,20 @@ The wallet database can contain many wallets, with many accounts, with many
 addresses for each account. Bcoin should theoretically be able to scale to
 hundreds of thousands of wallets/accounts/addresses.
 
-### Deviation from strict BIP44
+### Deviation from BIP44
+
+**It's important to backup the wallet database.** There are several deviations from
+[BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) that break
+determinism, and therefore it's recommended to backup the wallet database any time
+an account is created, as there are several possible configurations of an account.
+
+There is a command available via the wallet RPC called `backupwallet` that can clone
+the database to a new destination. There are also the RPC calls `dumpwallet` and
+`dumpprivkey` for exporting private keys. After shutting down the wallet process,
+it's also possible to copy the LevelDB database from the default location at
+`~/.bcoin/wallet` for main net or `~/.bcoin/<network>/wallet` for others. Copying
+LevelDB while the process is running can result in a corrupted copy. LevelDB is
+also prone to [database corruption](https://en.wikipedia.org/wiki/LevelDB#Bugs_and_reliability).
 
 Each account can be of a different type. You could have a pubkeyhash account,
 a multisig account, and a witness pubkeyhash account all in the same wallet.
@@ -25,26 +38,14 @@ Branch `0` and `1` are for `receive` and `change` addresses respectively (which
 is BIP44 standard) but branch `2` is used by bcoin to derive
 [nested SegWit addresses.](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#P2WPKH_nested_in_BIP16_P2SH)
 
-Unlike strict BIP44, bcoin allows empty wallet accounts to exist. This may be
-convenient to an enterprise system that matches wallet accounts with users, but
-developers must be aware that there is no deterministic method for recovering
-BIP44 wallets with empty (unused) accounts. A counter of used accounts must be
-recorded outside the wallet so the right number of accounts is re-generated
-during recovery from seed phrase.
-
-Accounts in a bcoin wallet can also be configured for multisig and import xpubs
+Accounts in a bcoin wallet can be configured for multisig and import xpubs
 from cosigners. Externally-generated Extended Private Keys (`xpriv`) and non-HD
 single address private keys can all be imported into a bcoin wallet. Balances
 of those addresses can be watched as well spent from (in the case of a private
 key).
 
-Because of these deviations from the standard, it is recommended to backup the
-wallet database any time any key of any type is imported. The database is located
-by default at `~/.bcoin/wallet` for main net or `~/.bcoin/<network>/wallet` for
-others. The RPC calls `dumpwallet` and `dumpprivkey` are also available for exporting
-private keys.
-
-### Accounts
-
-Note that accounts should not be accessed directly from the public API. They do
-not have locks which can lead to race conditions during writes.
+Unlike [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki),
+bcoin does not limit account depth and a new account can be created 
+after an empty account. This can create issues with deterministic account
+discovery from the master node (seed) as there are `2 ^ 31 - 1` _(worst case)_
+possible accounts to search.
