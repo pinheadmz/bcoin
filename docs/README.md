@@ -3,12 +3,12 @@
 - [Configuration](Configuration.md)
 - [Wallet System](Wallet-System.md)
 - [Design](Design.md)
-- [Guides](https://bcoin.io/guides.html)
+- [Guides](https://bcoin.io/guides.html):link:
 
 ## Running
 - [Bcoin CLI](CLI.md)
-- [Running in the Browser](https://bcoin.io/guides/browser.html)
-- [REST and RPC API](https://bcoin.io/api-docs/index.html#introduction)
+- [Running in the Browser](https://bcoin.io/guides/browser.html):link:
+- [REST and RPC API](https://bcoin.io/api-docs/index.html#introduction):link:
 
 ## Code Examples
 
