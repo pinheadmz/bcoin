@@ -1,4 +1,5 @@
 'use strict';
+
 const bcoin = require('../..').set('main');
 
 const Logger = require('blgr');

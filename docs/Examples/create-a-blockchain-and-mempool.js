@@ -1,4 +1,5 @@
 'use strict';
+
 const bcoin = require('../..');
 
 // Default network (so we can avoid passing
