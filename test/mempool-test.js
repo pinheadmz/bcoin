@@ -1245,6 +1245,20 @@ describe('Mempool', function() {
         type: 'VerifyError',
         reason: 'insufficient fee'
       });
+
+      // Try again with higher fee
+      const mtx3 = new MTX();
+      mtx3.addCoin(coin);
+      mtx3.addOutput(addr2, coin.value - 1200); // 1200 satoshi fee
+      chaincoins.sign(mtx3);
+      assert(mtx3.verify());
+      const tx3 = mtx3.toTX();
+
+      await mempool.addTX(tx3);
+
+      // tx1 has been replaced by tx3
+      assert(!mempool.has(tx1.hash()));
+      assert(mempool.has(tx3.hash()));
     });
 
     it('should reject replacement that doesnt pay all child fees', async() => {
@@ -1256,6 +1270,7 @@ describe('Mempool', function() {
       let coin = originalCoin;
 
       // Generate chain of 10 transactions, each paying 1000 sat fee
+      const childHashes = [];
       for (let i = 0; i < 10; i++) {
         const mtx = new MTX();
         mtx.addCoin(coin);
@@ -1265,6 +1280,8 @@ describe('Mempool', function() {
         assert(mtx.verify());
         const tx = mtx.toTX();
         await mempool.addTX(tx);
+
+        childHashes.push(tx.hash());
 
         coin = Coin.fromTX(tx, 0, -1);
       }
@@ -1289,6 +1306,21 @@ describe('Mempool', function() {
         type: 'VerifyError',
         reason: 'insufficient fee'
       });
+
+      // Try again with higher fee
+      const mtx3 = new MTX();
+      mtx3.addCoin(originalCoin);
+      mtx3.addOutput(addr2, originalCoin.value - fee);
+      chaincoins.sign(mtx3);
+      assert(mtx3.verify());
+      const tx3 = mtx3.toTX();
+
+      await mempool.addTX(tx3);
+
+      // All child TXs have been replaced by tx3
+      for (const hash of childHashes)
+        assert(!mempool.has(hash));
+      assert(mempool.has(tx3.hash()));
     });
 
     it('should reject replacement including new unconfirmed UTXO', async() => {
@@ -1365,6 +1397,8 @@ describe('Mempool', function() {
       await mempool.addTX(tx1);
 
       // Spend each of those outputs individually
+      let tx;
+      const hashes = [];
       for (let i = 0; i < 100; i++) {
         const mtx = new MTX();
         const coin = Coin.fromTX(tx1, i, -1);
@@ -1372,14 +1406,19 @@ describe('Mempool', function() {
         mtx.addOutput(addr1, coin.value - 1000);
         chaincoins.sign(mtx);
         assert(mtx.verify());
-        const tx = mtx.toTX();
+        tx = mtx.toTX();
+
+        hashes.push(tx.hash());
+
         await mempool.addTX(tx);
       }
 
       // Attempt to evict the whole batch by replacing the first TX (tx1)
       const mtx2 = new MTX();
       mtx2.addCoin(coin0);
-      mtx2.addOutput(addr1, coin0.value - 1000);
+      mtx2.addCoin(coin1);
+      // Send with massive fee to pay for 100 evicted TXs
+      mtx2.addOutput(addr1, 5000);
       chaincoins.sign(mtx2);
       assert(mtx2.verify());
       const tx2 = mtx2.toTX();
@@ -1390,6 +1429,19 @@ describe('Mempool', function() {
         type: 'VerifyError',
         reason: 'too many potential replacements'
       });
+
+      // Manually remove one of the descendants in advance
+      const entry = mempool.getEntry(tx.hash());
+      mempool.evictEntry(entry);
+
+      // Send back the same TX
+      await mempool.addTX(tx2);
+
+      // Entire mess has been replaced by tx2
+      assert(mempool.has(tx2.hash()));
+      assert(!mempool.has(tx1.hash()));
+      for (const hash of hashes)
+        assert(!mempool.has(hash));
     });
   });
 });
