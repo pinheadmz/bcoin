@@ -10,6 +10,7 @@ const Address = require('../lib/primitives/address');
 const Script = require('../lib/script/script');
 const Outpoint = require('../lib/primitives/outpoint');
 const MTX = require('../lib/primitives/mtx');
+const TX = require('../lib/primitives/tx');
 const FullNode = require('../lib/node/fullnode');
 const ChainEntry = require('../lib/blockchain/chainentry');
 const pkg = require('../lib/pkg');
@@ -493,6 +494,38 @@ describe('HTTP', function() {
     // Rescan from height 5 -- should return blocks 5 through 10, inclusive.
     await nclient.call('rescan', 5);
     assert.deepStrictEqual(matchingBlocks, blocks.slice(4));
+  });
+
+  it('should create TX with default sequence value', async () => {
+    let tx = await wallet.createTX({
+      outputs: [{
+        address: addr.toString(node.network),
+        value: 10000
+      }]
+    });
+
+    tx = TX.fromJSON(tx);
+
+    for (const input of tx.inputs)
+      assert.strictEqual(input.sequence, 0xffffffff);
+
+    assert(!tx.isRBF());
+  });
+
+  it('should create TX with opt-in replaceablity', async () => {
+    let tx = await wallet.createTX({
+      outputs: [{
+        address: addr.toString(node.network),
+        value: 10000
+      }],
+      replaceable: true
+    });
+
+    tx = TX.fromJSON(tx);
+
+    assert.strictEqual(tx.inputs[0].sequence, 0xfffffffd);
+
+    assert(tx.isRBF());
   });
 
   it('should cleanup', async () => {

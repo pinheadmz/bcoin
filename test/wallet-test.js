@@ -1756,4 +1756,40 @@ describe('Wallet', function() {
     consensus.COINBASE_MATURITY = 100;
     // await wdb.close();
   });
+
+  describe('Replace-by-fee', function() {
+    let wallet, address;
+
+    before(async () => {
+      wallet = await wdb.create();
+      address = await wallet.receiveAddress();
+
+      const cb = new MTX();
+      cb.addInput(dummyInput());
+      cb.addOutput(address, 1 * 1e8);
+      await wdb.addTX(cb.toTX());
+    });
+
+    it('should create TX with default sequence value', async () => {
+      const tx = await wallet.createTX({
+        outputs: [{address, value: 10000}]
+      });
+
+      for (const input of tx.inputs)
+        assert.strictEqual(input.sequence, 0xffffffff);
+
+      assert(!tx.isRBF());
+    });
+
+    it('should create TX with opt-in replaceablity', async () => {
+      const tx = await wallet.createTX({
+        outputs: [{address, value: 10000}],
+        replaceable: true
+      });
+
+      assert.strictEqual(tx.inputs[0].sequence, 0xfffffffd);
+
+      assert(tx.isRBF());
+    });
+  });
 });
